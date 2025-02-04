@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Sentiment Analyzer</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
+        input { padding: 10px; width: 300px; }
+        button { padding: 10px; }
+        table {
+            width: 80%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .positive { color: green; }
+        .negative { color: red; }
+        .neutral { color: gray; }
+    </style>
+</head>
+<body>
+
+    <h1>News Sentiment Analyzer</h1>
+    <input type="text" id="keyword" placeholder="Enter keyword">
+    <button onclick="fetchNews()">Search</button>
+    
+    <table id="results" style="display:none;">
+        <thead>
+            <tr>
+                <th>URL</th>
+                <th>Sentiment</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        async function fetchNews() {
+            let keyword = document.getElementById("keyword").value;
+            if (!keyword) {
+                alert("Please enter a keyword!");
+                return;
+            }
+
+            let response = await fetch(`/search?keyword=${keyword}`);
+            let data = await response.json();
+            
+            let resultDiv = document.getElementById("results");
+            let tbody = resultDiv.querySelector("tbody");
+            tbody.innerHTML = "";  // Clear previous results
+            resultDiv.style.display = "block";  // Show the table
+
+            data.forEach(article => {
+                let row = document.createElement("tr");
+
+                let urlCell = document.createElement("td");
+                let sentimentCell = document.createElement("td");
+
+                let color = article.sentiment === "Positive" ? "green" :
+                            article.sentiment === "Negative" ? "red" : "gray";
+
+                urlCell.innerHTML = `<a href="${article.url}" target="_blank">${article.url}</a>`;
+                sentimentCell.innerHTML = `<span style="color:${color}">${article.sentiment}</span>`;
+
+                row.appendChild(urlCell);
+                row.appendChild(sentimentCell);
+                tbody.appendChild(row);
+            });
+        }
+    </script>
+
+</body>
+</html>
